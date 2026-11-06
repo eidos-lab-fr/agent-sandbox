@@ -18,7 +18,7 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-          ORG: ${{ vars.ORG }}
+          ORG: ${{ vars.ORG || github.repository_owner }}
           PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
           PROJECT_ID: ${{ vars.PROJECT_ID }}
           STATUS_FIELD_ID: ${{ vars.STATUS_FIELD_ID }}

@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-      ORG: ${{ vars.ORG }}
+      ORG: ${{ vars.ORG || github.repository_owner }}
       NUM: ${{ inputs.project_number }}
       REPO: ${{ github.repository }}
     steps:
