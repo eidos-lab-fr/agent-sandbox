@@ -1,0 +1,63 @@
+name: Agent dev
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  dev:
+    if: >-
+      github.event.label.name == 'ready-for-dev' &&
+      github.event.sender.login == 'AdrienBalcioglu'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency: issue-${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Déterminer le scope
+        id: scope
+        env:
+          LABELS: ${{ toJson(github.event.issue.labels.*.name) }}
+        run: |
+          SCOPE=$(echo "$LABELS" | jq -r '.[] | select(startswith("scope:")) | sub("scope:"; "")' | head -n1)
+          if [ -z "$SCOPE" ] || [ ! -f ".github/agents/dev-$SCOPE.md" ]; then
+            SCOPE=general
+          fi
+          echo "scope=$SCOPE" >> "$GITHUB_OUTPUT"
+          echo "Scope retenu : $SCOPE"
+
+      - name: Board → En développement
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          ORG: ${{ vars.ORG }}
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          PROJECT_ID: ${{ vars.PROJECT_ID }}
+          STATUS_FIELD_ID: ${{ vars.STATUS_FIELD_ID }}
+        run: bash .github/scripts/set-status.sh "${{ github.event.issue.html_url }}" "${{ vars.OPT_EN_DEV }}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Tu es un agent de développement de ce repo.
+            Charge et applique à la lettre le fichier .github/agents/dev-${{ steps.scope.outputs.scope }}.md, ainsi que CLAUDE.md.
+            Ticket à traiter : #${{ github.event.issue.number }} dans ${{ github.repository }} (lis-le avec gh issue view ${{ github.event.issue.number }}).
+            Branche à créer : agent/${{ github.event.issue.number }}-<slug court>.
+            Termine en ouvrant la PR avec gh pr create, ou en commentant le ticket avec le label needs-human si tu dois t'arrêter.
+          claude_args: >-
+            --max-turns 60
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(npm:*),Bash(npx:*)"

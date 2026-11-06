@@ -1,0 +1,36 @@
+name: Fonctionnalité
+description: Ticket prêt à être confié à un agent
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Chemin de la spec
+      placeholder: specs/001-nom/spec.md
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: Pose aussi le label scope correspondant (scope:front, scope:docs)
+      options:
+        - front
+        - docs
+    validations:
+      required: true
+  - type: textarea
+    id: perimetre
+    attributes:
+      label: Ce que ce ticket couvre
+      description: Numéros des tâches de tasks.md concernées
+  - type: textarea
+    id: acceptation
+    attributes:
+      label: Critères d'acceptation
+      description: Une ligne par critère, vérifiable par un test
+    validations:
+      required: true
+  - type: textarea
+    id: hors-perimetre
+    attributes:
+      label: Hors périmètre
