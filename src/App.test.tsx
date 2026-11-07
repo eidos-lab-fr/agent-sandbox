@@ -6,6 +6,7 @@ afterEach(cleanup)
 
 const getCounter = () => screen.getByRole('button', { name: /^Compteur : / })
 const getReset = () => screen.getByRole('button', { name: 'Réinitialiser' })
+const getDecrement = () => screen.getByRole('button', { name: 'Décrémenter' })
 
 describe('App', () => {
   it('incrémente le compteur au clic', () => {
@@ -58,6 +59,41 @@ describe('App', () => {
       expect(reset.getAttribute('type')).toBe('button')
       reset.focus()
       expect(document.activeElement).toBe(reset)
+    })
+  })
+
+  describe('bouton Décrémenter', () => {
+    it('diminue le compteur de 1 quand il est supérieur à 0', () => {
+      render(<App />)
+      fireEvent.click(getCounter())
+      fireEvent.click(getCounter())
+      fireEvent.click(getDecrement())
+      expect(getCounter().textContent).toBe('Compteur : 1')
+    })
+
+    it('est désactivé quand le compteur vaut 0', () => {
+      render(<App />)
+      expect(getDecrement()).toHaveProperty('disabled', true)
+      fireEvent.click(getCounter())
+      expect(getDecrement()).toHaveProperty('disabled', false)
+      fireEvent.click(getDecrement())
+      expect(getDecrement()).toHaveProperty('disabled', true)
+    })
+
+    it('ne rend jamais le compteur négatif', () => {
+      render(<App />)
+      fireEvent.click(getCounter())
+      for (let i = 0; i < 3; i++) fireEvent.click(getDecrement())
+      expect(getCounter().textContent).toBe('Compteur : 0')
+    })
+
+    it('a pour nom accessible « Décrémenter » et se place entre le compteur et « Réinitialiser »', () => {
+      render(<App />)
+      const decrement = getDecrement()
+      expect(decrement.tagName).toBe('BUTTON')
+      expect(decrement.getAttribute('type')).toBe('button')
+      const names = screen.getAllByRole('button').map((b) => b.textContent)
+      expect(names).toEqual(['Compteur : 0', 'Décrémenter', 'Réinitialiser'])
     })
   })
 })

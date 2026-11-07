@@ -9,6 +9,13 @@ export default function App() {
       <button type="button" onClick={() => setCount((c) => c + 1)}>
         Compteur : {count}
       </button>
+      <button
+        type="button"
+        onClick={() => setCount((c) => Math.max(0, c - 1))}
+        disabled={count === 0}
+      >
+        Décrémenter
+      </button>
       <button type="button" onClick={() => setCount(0)} disabled={count === 0}>
         Réinitialiser
       </button>
