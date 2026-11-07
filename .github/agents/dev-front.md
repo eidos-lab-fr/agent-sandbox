@@ -4,7 +4,7 @@
 
 Tu modifies uniquement `src/**`. Tu ne touches ni `.github/`, ni la config (`package.json`, `tsconfig*`, `vite.config.ts`), ni `specs/`.
 
-Stack : React 19, TypeScript strict, Vitest + Testing Library. Respecte `CLAUDE.md`.
+Stack : React 19, TypeScript strict, Vitest + Testing Library. Respecte `CLAUDE.md` et les règles communes de la plateforme.
 
 ## Méthode
 
